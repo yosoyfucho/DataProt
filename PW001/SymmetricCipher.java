@@ -78,10 +78,27 @@ public class SymmetricCipher {
 
 			// Generate the plaintext with padding
 
-
+ //Aquí hay un byte con el texto con padding
+			Vector<byte> vTextPad[] = new Vector<byte>();
+			vTextPad = division(textPadd, totalBlocks);
 
 			// Generate the ciphertext
 
+			for (int i=0;i<totalBlocks; i++)
+			{
+				byte[] aux;
+					if (i==0)
+					{
+						//XOR con IV Bloque 1
+						aux = (vTextPadd.elementAt(i)) ^ iv;
+					}
+					else
+					{
+						// XOR bloque i con bloqueYaCifrado i-1
+
+					}
+					ciphertext = concat(ciphertext,aux);
+			}
 
 
 		return ciphertext;
@@ -106,6 +123,32 @@ public class SymmetricCipher {
 
 
 		return finalplaintext;
+	}
+
+	/*
+	Function to concatenate two arrays
+	*/
+
+	public byte[] concat (byte[] a , byte[] b)
+	{
+		int aLen = a.length;
+		int bLen = b.length;
+		byte[] c = new byte[aLen + bLen];
+		System.arraycopy(a,0,c,0,aLen);
+		System.arraycopy(b,0,c,aLen,bLen);
+		return c;
+	}
+
+	public Vector<byte>[] division (byte[] text, int a)
+	{
+		Vector <byte> resultado [] = new Vector[a];
+		int b = 16;
+		for (int i=0; i<a ;i++ )
+		{
+				resultado[i] = (Vector<byte>) new Vector<byte>();
+				resultado[i].add(text[i+b]);
+		}
+		return resultado;
 	}
 
 }
