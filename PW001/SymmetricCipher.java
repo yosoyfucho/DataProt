@@ -64,6 +64,7 @@ public class SymmetricCipher {
 			vTextPad = division(textPadd, totalBlocks);
 
 			// Generate the ciphertext
+			byte [] previousBlock = null;
 
 			for (int i=0;i<totalBlocks; i++)
 			{
@@ -72,10 +73,14 @@ public class SymmetricCipher {
 					{
 						//XOR con IV Bloque 1
 						aux = (vTextPad.elementAt(i)) ^ iv;
+
+						previousBlock = cifrado(aux);
 					}
 					else
 					{
 						// XOR bloque i con bloqueYaCifrado i-1
+						aux = (vTextPad.elementAt(i)) ^ previousBlock;
+
 
 					}
 					ciphertext = concat(ciphertext,aux);
