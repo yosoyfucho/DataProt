@@ -14,6 +14,7 @@ import java.security.InvalidKeyException;
 import java.text.NumberFormat;
 import java.util.Arrays;
 
+
 public class SymmetricCipher {
 
 	byte[] byteKey;
@@ -44,7 +45,7 @@ public class SymmetricCipher {
 		
 		int bytesSueltos = 0;
 		int numBytesFullBlocks = 0;
-		int totalBlocks = 0; //Para prints, se puede quitar
+		int totalBlocks = 0; 
 		int textLength = 0;
 		int numFullBlocks = 0;
 		
@@ -91,38 +92,46 @@ public class SymmetricCipher {
 	    System.out.println("Numero de bloques que necesita un paquete de " + textLength + " bytes : " + totalBlocks + " bloques");
 	    
 	    //Concatenamos el ultimo bloque ya de 16B con el resto de bloques enteros	    
-	    byte[] textPadd= concat(bytesOfFullBlocks, bytesOfLastBlock);
-		
+	    byte[] textPadd = concat(bytesOfFullBlocks, bytesOfLastBlock);
 	    /******************************************************************/
-
-		//Aqui hay un byte con el texto con padding
-			Vector<byte> vTextPad[] = new Vector<byte>();
-			vTextPad = division(textPadd, totalBlocks);
-
-			// Generate the ciphertext
-			byte [] previousBlock = null;
-
-			for (int i=0;i<totalBlocks; i++)
-			{
-				byte[] aux;
-					if (i==0)
-					{
-						//XOR con IV Bloque 1
-						aux = (vTextPad.elementAt(i)) ^ iv;
-
-						previousBlock = cifrado(aux);
-					}
-					else
-					{
-						// XOR bloque i con bloqueYaCifrado i-1
-						aux = (vTextPad.elementAt(i)) ^ previousBlock;
-
-
-					}
-					ciphertext = concat(ciphertext,aux);
-			}
-
-
+	    
+	    byte[] aux2 = new byte[16];
+    	byte[] lastCipherBlock = new byte[16];
+    	byte[] arrayAfterXOR = new byte[16];
+    	byte[] cipherBlock = new byte[16];
+    	byte[] totalCipherText = null;
+    	
+    	//Recorremos todos los bloques
+	    for (int i=0; i<totalBlocks; i++)
+	    {
+	    	//Copiamos el bloque en el que estamos en el array auxiliar
+	    	System.arraycopy(textPadd, i*16, aux2, 0, 16);
+	    	
+	    	//Si es la primera iteracion el XOR es con el vector de inicializacion
+	    	if(i==0)
+	    	{
+	    		for(int j=0;j<16;j++)
+	    		{
+	    			arrayAfterXOR[j] = (byte) (aux2[j] ^ iv[j]);
+	    		}
+	    	}
+	    	//En el resto de iteraciones se hace XOR con el bloque cifrado de la iteracion anterior
+	    	else
+	    	{
+	    		for(int j=0;j<16;j++)
+	    		{
+	    			arrayAfterXOR[j] = (byte) (aux2[j] ^ cipherBlock[j]);
+	    		}	
+	    	}
+	    	//Usamos una instancia de la clase SymmetricEncription para encriptar el bloque
+	    	SymmetricEncryption cipher = new SymmetricEncryption(byteKey);
+	    	cipherBlock = cipher.encryptBlock(arrayAfterXOR);
+	    	
+	    	//Concatenamos el bloque encriptado con el resto de bloques encriptados hasta ahora
+	    	ciphertext = concat(ciphertext, cipherBlock);
+	    	
+	    }
+	    
 		return ciphertext;
 	}
 
@@ -150,29 +159,41 @@ public class SymmetricCipher {
 	/*
 	Function to concatenate two arrays
 	*/
+	//Tiene que ser static??? Me dio error en mi main...
 
 	public byte[] concat (byte[] a , byte[] b)
-	{
-		int aLen = a.length;
-		int bLen = b.length;
-		byte[] c = new byte[aLen + bLen];
-		System.arraycopy(a,0,c,0,aLen);
-		System.arraycopy(b,0,c,aLen,bLen);
+	{	
+		int aLen;
+		int bLen;
+		byte[] c;
+		
+		if(a==null){
+			aLen=0;
+		}else{
+			aLen = a.length;
+		}
+		
+		if(b == null){
+			bLen=0;			
+		}else{
+			bLen = b.length;
+		}
+		
+		if(aLen == 0 && bLen == 0){
+			c = null;
+		}else if (aLen==0 && bLen != 0){
+			c=b;
+		}else if (aLen != 0 && bLen == 0){
+			c=a;
+		}else{
+			c = new byte[aLen + bLen];
+			System.arraycopy(a,0,c,0,aLen);
+			System.arraycopy(b,0,c,aLen,bLen);
+		}
 		return c;
 	}
 
-	public Vector<byte>[] division (byte[] text, int a)
-	{
-		Vector <byte> resultado [] = new Vector[a];
-		int b = 16;
-		for (int i=0; i<a ;i++ )
-		{
-				resultado[i] = (Vector<byte>) new Vector<byte>();
-				resultado[i].add(text[i+b]);
-		}
-		return resultado;
-	}
-
+	
 	/*      	>>> Metodo addPadding <<<
 	 * El bloque de entrada tendra entre 0 y 15 bytes
 	 *
