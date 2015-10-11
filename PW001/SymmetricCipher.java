@@ -1,6 +1,6 @@
 /*
-Laura Benito Martín 100284695
-Rafael León Miranda 100275593
+Laura Benito Martin 100284695
+Rafael Leon Miranda 100275593
 */
 
 import java.io.FileDescriptor;
@@ -49,7 +49,7 @@ public class SymmetricCipher {
 
 		numBytesPad = input.length - auxMod;
 		numBytesTot = numBytesPad + input.length;
-		totalBlocks = numBytesTot / 16
+		totalBlocks = numBytesTot / 16;
 		//Comprobar con if si cumple Padding
 		if (auxMod == 0)
 		{
