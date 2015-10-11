@@ -60,10 +60,6 @@ public class SymmetricCipher {
 			for (int i =0;i<totalBlocks; i++)
 			{
 
-
-
-
-
 					if (i==0)
 					{
 						//XOR con IV Bloque 1
@@ -90,7 +86,7 @@ public class SymmetricCipher {
 					if (i==0)
 					{
 						//XOR con IV Bloque 1
-						aux = (vTextPadd.elementAt(i)) ^ iv;
+						aux = (vTextPad.elementAt(i)) ^ iv;
 					}
 					else
 					{
