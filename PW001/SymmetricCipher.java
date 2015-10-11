@@ -38,30 +38,64 @@ public class SymmetricCipher {
 	public byte[] encryptCBC (byte[] input, byte[] byteKey) throws Exception {
 
 		byte[] ciphertext = null;
+		byte[] bytesOfLastBlock = null;
+		byte[] bytesOfFullBlocks = null;
 		byte[] aux = null;
+		
+		int bytesSueltos = 0;
+		int numBytesFullBlocks = 0;
+		int totalBlocks = 0; //Para prints, se puede quitar
+		int textLength = 0;
+		int numFullBlocks = 0;
+		
+		//Longitud total del array de entrada
+		textLength = input.length;
+		
+		//Numero de bloques enteros
+		numFullBlocks = (int) textLength/16;
+		
+		//Numero de bytes que no llega a formar un bloque entero
+	    bytesSueltos = textLength % 16;
+	  
+	    //Numero de bytes totales de todos los bloques enteros
+		numBytesFullBlocks = numFullBlocks*16;
 
-		int numBytesPad = 0;
-		int numBytesTot = 0;
-		int totalBlocks = 0;
+		//Array de bytes que incluye todos los bloques enteros
+		bytesOfFullBlocks= new byte [numBytesFullBlocks];
+    	System.arraycopy(input, 0, bytesOfFullBlocks, 0, numBytesFullBlocks);
+    	
+		//Coger el ultimo bloque, aplicarle el padding y concatenarlo al texto principal
+		
+    	
+	    //Si hay bytes que no forman un bloque entero necesitamos que el ultimo bloque tenga padding
+	    if(bytesSueltos!=0)
+	    {
+	    	bytesOfLastBlock = new byte[bytesSueltos] ;
+	    		    	
+	    	//Guarda el array de bytes del ultimo bloque
+	    	//Copia desde el byte donde acaban los bloques completos al nuevo array de longitud los bytes que sobraban
+	    	System.arraycopy(input, numBytesFullBlocks, bytesOfLastBlock, 0, bytesSueltos);
+	    	
+	    	totalBlocks = numFullBlocks + 1;
+	    	
+	    	//Ponemos el padding necesario al ultimo bloque
+	    	bytesOfLastBlock = addPadding(bytesOfLastBlock);
+	      
+	    }
+	    //Si los bloques estan completos se tiene que poner otro nuevo de padding entero
+	    else
+	    {
+	    	bytesOfLastBlock = addPadding(bytesOfLastBlock);
+	    }
+	    
+	    System.out.println("Numero de bloques que necesita un paquete de " + textLength + " bytes : " + totalBlocks + " bloques");
+	    
+	    //Concatenamos el ultimo bloque ya de 16B con el resto de bloques enteros	    
+	    byte[] textPadd= concat(bytesOfFullBlocks, bytesOfLastBlock);
+		
+	    /******************************************************************/
 
-		int auxMod = 0;
-		int audDiv = 0;
-
-		auxMod = input.length % 16;
-
-		numBytesPad = input.length - auxMod;
-		numBytesTot = numBytesPad + input.length;
-		totalBlocks = numBytesTot / 16;
-		//Comprobar con if si cumple Padding
-		if (auxMod == 0)
-		{
-			totalBlocks ++;
-		}
-			//Check arraycopy
-
-
-
- //Aquí hay un byte con el texto con padding
+		//Aqui hay un byte con el texto con padding
 			Vector<byte> vTextPad[] = new Vector<byte>();
 			vTextPad = division(textPadd, totalBlocks);
 
@@ -140,9 +174,9 @@ public class SymmetricCipher {
 	}
 
 	/*      	>>> Metodo addPadding <<<
-	 * El bloque de entrada tendrá entre 0 y 15 bytes
+	 * El bloque de entrada tendra entre 0 y 15 bytes
 	 *
-	 * El numero de bytes que faltan serán entre 1 y 16
+	 * El numero de bytes que faltan seran entre 1 y 16
 	 * Se utiliza el formato #PKCS5 que consiste en:
 	 * Rellenar los huecos de bytes con el valor numerico
 	 * del numero de bytes necesarios
@@ -159,7 +193,7 @@ public class SymmetricCipher {
 		byte[] blockWithPadding = null;
 		int inputLength;
 
-		//Si el array está vacío la longitud es 0
+		//Si el array esta vacio la longitud es 0
 		if(input == null)
 		{
 			inputLength= 0;
