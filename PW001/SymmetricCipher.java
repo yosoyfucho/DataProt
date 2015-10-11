@@ -3,6 +3,7 @@ Laura Benito Martin 100284695
 Rafael Leon Miranda 100275593
 */
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.*;
 import java.security.InvalidKeyException;
 import java.text.NumberFormat;
+import java.util.Arrays;
 
 public class SymmetricCipher {
 
