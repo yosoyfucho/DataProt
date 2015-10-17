@@ -168,6 +168,8 @@ public class SymmetricCipher {
 		//Recorremos todos los bloques
 	    for (int i=0; i<totalBlocks; i++)
 	    {
+	    	outputBlock = new byte[16];
+	    	
 	    	//Copiamos el bloque en el que estamos en el array auxiliar
 	    	System.arraycopy(input, i*16, inputBlock, 0, 16);
 	    	
@@ -185,7 +187,6 @@ public class SymmetricCipher {
 	    	//Si es la primera iteracion el XOR es con el vector de inicializacion
 	    	if(i==0)
 	    	{
-	    		System.out.println("Desencriptando primer bloque");
 	    		for(int j=0;j<16;j++)
 	    		{
 	    			outputBlock[j] = (byte) (auxBlock[j] ^ iv[j]);
@@ -206,22 +207,26 @@ public class SymmetricCipher {
 	    		    	
 	    	plaintext = concat(plaintext, outputBlock);
 	    	
+	    	
 	    	String auxStr3= new String(plaintext);
-	    	System.out.println("Iteraccion numero " + i + " lo que lleva desencriptado tras concatenar : || " + auxStr3 + " || " );	    	
+	    	//System.out.println("Iteraccion numero " + i + " lo que lleva desencriptado tras concatenar : || " + auxStr3 + " || " );	    	
 	    }
-	    
-	    
-	    System.out.println("Output plaintext sin quitar padding: " + Arrays.toString(plaintext));
-
-
+	   
 		// Eliminate the padding
 	    
 	    System.arraycopy(plaintext, textLength-16, lastBlock, 0, 16);
-
-	    System.out.println("Ultimo bloque " + Arrays.toString(lastBlock));
 	    
-	    finalplaintext = plaintext;
-
+	    int numPadding = (int)lastBlock[15];
+	    
+	    int plaintextLength = plaintext.length;
+	    int finalLength = plaintextLength-numPadding;
+	    
+	    finalplaintext = new byte[finalLength];
+	    System.arraycopy(plaintext, 0, finalplaintext, 0, finalLength );
+	    
+	    String out = new String(finalplaintext);	    
+	    System.out.println("Plaintext final sin padding: " + out);
+	    
 		return finalplaintext;
 	}
 
@@ -314,7 +319,10 @@ public class SymmetricCipher {
 
 		//Convertimos a byte[] de nuevo
 		blockWithPadding = outputStream.toByteArray( );
-
+		 
+		/*
+		 blockWithPadding = concat(input,padding);
+		 * */
 		return blockWithPadding;
 	}
 
