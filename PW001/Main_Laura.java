@@ -22,7 +22,7 @@ public class Main{
 	
 	public static void main(String args[]) throws Exception{
 
-		String plaintext = "Hola Rafa! Gracias por haberme dado pizza.... Te quiero!! :D AAA";
+		String plaintext = "Hola Rafa! Que tal todo? tengo hambre, si quieres nos vamos al salon por si viene el chico de la comida...MM comida!! comiiiiidaaaaaaa... No, Lorem ipsum no... mejor esto! wiiiii";
 		byte[] input = plaintext.getBytes();
 		
 		

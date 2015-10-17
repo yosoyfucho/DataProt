@@ -77,8 +77,7 @@ public class SymmetricCipher {
 	    	//Copia desde el byte donde acaban los bloques completos al nuevo array de longitud los bytes que sobraban
 	    	System.arraycopy(input, numBytesFullBlocks, bytesOfLastBlock, 0, bytesSueltos);
 	    	
-	    	totalBlocks = numFullBlocks + 1;
-	    	
+	    		    	
 	    	//Ponemos el padding necesario al ultimo bloque
 	    	bytesOfLastBlock = addPadding(bytesOfLastBlock);
 	      
@@ -86,13 +85,16 @@ public class SymmetricCipher {
 	    //Si los bloques estan completos se tiene que poner otro nuevo de padding entero
 	    else
 	    {
+	    	
 	    	bytesOfLastBlock = addPadding(bytesOfLastBlock);
 	    }
-	    
+	    totalBlocks = numFullBlocks + 1;
 	    System.out.println("Numero de bloques que necesita un paquete de " + textLength + " bytes : " + totalBlocks + " bloques");
 	    
 	    //Concatenamos el ultimo bloque ya de 16B con el resto de bloques enteros	    
 	    byte[] textPadd = concat(bytesOfFullBlocks, bytesOfLastBlock);
+	    
+	    
 	    /******************************************************************/
 	    
 	    byte[] aux2 = new byte[16];
@@ -216,8 +218,10 @@ public class SymmetricCipher {
 	    
 	    System.arraycopy(plaintext, textLength-16, lastBlock, 0, 16);
 	    
-	    int numPadding = (int)lastBlock[15];
+	    System.out.println("Ultimo bloque: " + Arrays.toString(lastBlock));
 	    
+	    int numPadding = (int)lastBlock[15];
+	    System.out.println("numPadding: "+ numPadding);
 	    int plaintextLength = plaintext.length;
 	    int finalLength = plaintextLength-numPadding;
 	    
@@ -314,8 +318,13 @@ public class SymmetricCipher {
 		//Concatenamos los dos arrays resultantes
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
 
-		outputStream.write(input);
-		outputStream.write(padding);
+		if(input != null){
+			outputStream.write(input);
+			outputStream.write(padding);
+		}
+		else{
+			outputStream.write(padding);
+		}
 
 		//Convertimos a byte[] de nuevo
 		blockWithPadding = outputStream.toByteArray( );
