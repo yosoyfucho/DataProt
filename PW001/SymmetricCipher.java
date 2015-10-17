@@ -106,6 +106,8 @@ public class SymmetricCipher {
 	    {
 	    	//Copiamos el bloque en el que estamos en el array auxiliar
 	    	System.arraycopy(textPadd, i*16, aux2, 0, 16);
+	    	String auxString = new String(aux2);
+	    	System.out.println("Iteraccion numero " + i + " bloque a encriptar " + auxString );
 	    	
 	    	//Si es la primera iteracion el XOR es con el vector de inicializacion
 	    	if(i==0)
@@ -127,6 +129,8 @@ public class SymmetricCipher {
 	    	SymmetricEncryption cipher = new SymmetricEncryption(byteKey);
 	    	cipherBlock = cipher.encryptBlock(arrayAfterXOR);
 	    	
+	    	
+	    	
 	    	//Concatenamos el bloque encriptado con el resto de bloques encriptados hasta ahora
 	    	ciphertext = concat(ciphertext, cipherBlock);
 	    	
@@ -142,16 +146,81 @@ public class SymmetricCipher {
 
 	public byte[] decryptCBC (byte[] input, byte[] byteKey) throws Exception {
 
+		byte[] finalplaintext = null;
+		byte[] plaintext = null;
+		byte[] inputBlock = new byte[16];
+		byte[] inputPreviousBlock = new byte[16];
+		byte[] auxBlock = new byte[16];
+		byte[] outputBlock = new byte[16];
+		byte[] lastBlock = new byte[16];
 
-		byte [] finalplaintext = null;
-
-
+		//p[i]= c[i-1] XOR Decrypted(c[i])
+		
+		//Longitud total del array de entrada
+		int textLength = input.length;
+				
+		//Numero de bloques enteros (en teoria siempre sera multiplo de 16)
+		int totalBlocks = (int) textLength/16;
+		
+		
 		// Generate the plaintext
+		
+		//Recorremos todos los bloques
+	    for (int i=0; i<totalBlocks; i++)
+	    {
+	    	//Copiamos el bloque en el que estamos en el array auxiliar
+	    	System.arraycopy(input, i*16, inputBlock, 0, 16);
+	    	
+	    	//Obtenemos C(i-1)
+	    	if (i>0){
+	    		System.arraycopy(input, (i-1)*16, inputPreviousBlock, 0, 16);	    		
+	    	}
+	    	
+	    	//Obtenemos Decrypted(c[i])
+	    	//Usamos una instancia de la clase SymmetricEncription para desencriptar el bloque
+	    	SymmetricEncryption cipher = new SymmetricEncryption(byteKey);
+	    	auxBlock = cipher.decryptBlock(inputBlock);
+	    	
+	    	
+	    	//Si es la primera iteracion el XOR es con el vector de inicializacion
+	    	if(i==0)
+	    	{
+	    		System.out.println("Desencriptando primer bloque");
+	    		for(int j=0;j<16;j++)
+	    		{
+	    			outputBlock[j] = (byte) (auxBlock[j] ^ iv[j]);
+	    		}
+	    	}
+	    	//En el resto de iteraciones se hace XOR con el bloque sin descifrar de la iteracion anterior
+	    	else
+	    	{
+	    		
+	    		for(int j=0;j<16;j++)
+	    		{
+	    			outputBlock[j] = (byte) (auxBlock[j] ^ inputPreviousBlock[j]);
+	    		}	
+	    	}
+	    	String auxStr = new String(outputBlock);
+	    	
+	    	System.out.println("Iteraccion numero " + i + " bloque a desencriptar: || " + auxStr +" ||" );
+	    		    	
+	    	plaintext = concat(plaintext, outputBlock);
+	    	
+	    	String auxStr3= new String(plaintext);
+	    	System.out.println("Iteraccion numero " + i + " lo que lleva desencriptado tras concatenar : || " + auxStr3 + " || " );	    	
+	    }
+	    
+	    
+	    System.out.println("Output plaintext sin quitar padding: " + Arrays.toString(plaintext));
 
 
 		// Eliminate the padding
+	    
+	    System.arraycopy(plaintext, textLength-16, lastBlock, 0, 16);
 
-
+	    System.out.println("Ultimo bloque " + Arrays.toString(lastBlock));
+	    
+	    finalplaintext = plaintext;
 
 		return finalplaintext;
 	}
